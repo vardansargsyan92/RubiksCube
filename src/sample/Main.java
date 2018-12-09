@@ -93,7 +93,6 @@ public class Main extends Application {
                 new Button("Di"), new Button("E"), new Button("Ei"));
         Label lMov = new Label();
         rubik.getCount().addListener((ov, v, v1) -> {
-            bReset.setDisable(moves.getNumMoves() == 0);
             lMov.setText("Movements: " + (v1.intValue() + 1));
         });
         rubik.getLastRotation().addListener((ov, v, v1) -> {
