@@ -98,7 +98,7 @@ public class Rubik {
         /*
         Create content subscene, add cube, set camera and lights
         */
-        content = new ContentModel(800,600,dimCube); 
+        content = new ContentModel(920,520,dimCube);
         content.setContent(cube);
         
         /*
