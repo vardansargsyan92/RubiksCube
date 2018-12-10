@@ -72,7 +72,34 @@ public class Main extends Application {
             }
         });
 
-        ChangeListener<Number> clockLis = (ov, l, l1) -> clock.set(LocalTime.ofNanoOfDay(l1.longValue()).format(fmt));
+        /**
+         * Amalia
+         */
+        Button basicSearchButton = new Button("Basic");
+        basicSearchButton.setOnAction(e -> {
+            //TODO basic search
+        });
+
+        /**
+         * Seda
+         */
+        Button kociembaSearchButton = new Button("Kociemba");
+        kociembaSearchButton.setOnAction(e -> {
+            //TODO Kociemba search
+        });
+
+
+        /**
+         * Tigran
+         */
+        Button idaSearchButton = new Button("IDA*");
+        idaSearchButton.setOnAction(e -> {
+            //TODO IDA* search
+        });
+
+
+        ChangeListener<Number> clockLis =
+                (ov, l, l1) -> clock.set(LocalTime.ofNanoOfDay(l1.longValue()).format(fmt));
 
 
         rubik.isOnReplaying().addListener((ov, b, b1) -> {
@@ -85,8 +112,10 @@ public class Main extends Application {
         });
 
 
-
-        tbTop.getItems().addAll(new Separator(), bReset, bSc);
+        tbTop.getItems().addAll(new Separator(), bReset, bSc,
+                new Separator(), basicSearchButton,
+                new Separator(), kociembaSearchButton,
+                new Separator(), idaSearchButton);
         pane.setTop(tbTop);
 
         ToolBar tbBottom = new ToolBar(new Button("B"), new Button("Bi"), new Button("D"),
