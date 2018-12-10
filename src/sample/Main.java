@@ -26,6 +26,7 @@ import sample.model.Rubik;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -85,7 +86,8 @@ public class Main extends Application {
          */
         Button kociembaSearchButton = new Button("Kociemba");
         kociembaSearchButton.setOnAction(e -> {
-            //TODO Kociemba search
+            //TODO Kociemba search method
+            List<Integer> flattenRotations = rubik.getRotations().getCube();
         });
 
 
@@ -243,17 +245,6 @@ public class Main extends Application {
         });
     }
 
-    // called from button Replay
-    private void doReplay() {
-        pane.getChildren().stream().filter(withToolbars()).forEach(setDisable(true));
-        rubik.doReplay(moves.getMoves());
-        rubik.isOnReplaying().addListener((ov, v, v1) -> {
-            if (v && !v1) {
-                System.out.println("replayed!");
-                pane.getChildren().stream().filter(withToolbars()).forEach(setDisable(false));
-            }
-        });
-    }
 
     // some predicates for readability
     private static Predicate<Node> withToolbars() {
