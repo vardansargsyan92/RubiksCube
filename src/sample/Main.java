@@ -79,6 +79,9 @@ public class Main extends Application {
         Button basicSearchButton = new Button("Basic");
         basicSearchButton.setOnAction(e -> {
             //TODO basic search
+            //TODO test
+            String str = "D D Ri D D R R L Di L L R B B R D D U B B U Fi D F Li Ui Fi L Di L U U Di";
+            rubik.doSequence(str);
         });
 
         /**
@@ -88,6 +91,9 @@ public class Main extends Application {
         kociembaSearchButton.setOnAction(e -> {
             //TODO Kociemba search method
             List<Integer> flattenRotations = rubik.getRotations().getCube();
+            //TODO test
+            String str = "D D Ri D D R R L Di L L R B B R D D U B B U Fi D F Li Ui Fi L Di L U U Di";
+            rubik.doSequence(str);
         });
 
 
@@ -97,6 +103,9 @@ public class Main extends Application {
         Button idaSearchButton = new Button("IDA*");
         idaSearchButton.setOnAction(e -> {
             //TODO IDA* search
+            //TODO test
+            String str = "D D Ri D D R R L Di L L R B B R D D U B B U Fi D F Li Ui Fi L Di L U U Di";
+            rubik.doSequence(str);
         });
 
 
@@ -220,7 +229,7 @@ public class Main extends Application {
                 .forEach(tb -> {
                     ((ToolBar) tb).getItems().stream()
                             .filter(withMoveButtons().and(withButtonTextName(btRot)))
-                            .findFirst().ifPresent(n -> rubik.isHoveredOnClick().set(((Button) n).isHover()));
+                            .findFirst().ifPresent(n -> rubik.isHoveredOnClick().set(n.isHover()));
                 });
         rubik.rotateFace(btRot);
     }
