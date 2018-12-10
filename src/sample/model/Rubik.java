@@ -110,15 +110,16 @@ public class Rubik {
         */
         rotations = new Rotations();
         order = rotations.getCube();
+        // System.out.println(rotations.getManhattenHeuristic());
 //        System.out.println(""+order.stream().mapToLong(o->mapMeshes.keySet().stream().filter(k->k.contains(o.toString())).count()).sum());
 
         // save original position
         mapMeshes.forEach((k, v) -> mapTransformsOriginal.put(k, v.getTransforms().get(0)));
         orderOriginal = order.stream().collect(Collectors.toList());
-        
+
         /*
         Listener to perform an animated face rotation.
-        
+
         Note: by prepending the rotations it is not possible to create the animation with a timeline
         like this:
         Rotate r=new Rotate(0,axis);

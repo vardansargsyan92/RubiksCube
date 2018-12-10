@@ -3,6 +3,8 @@ package sample.math;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Math.abs;
+
 
 public class Rotations {
     
@@ -22,12 +24,18 @@ public class Rotations {
                                   {{58,55,60},{57,62,61},{47,56,63}},
                                   {{67,64,69},{66,71,70},{68,65,72}}};
     private final int[][][] tempCube=new int[3][3][3];
+    private int[] initStateMap = new int[27];
 
     public Rotations(){
         for(int f = 0; f < 3; f++){
             for(int l = 0; l < 3; l++){
                 System.arraycopy(cube[f][l], 0, tempCube[f][l], 0, 3);
             }
+        }
+        int index = 0;
+        for (Integer x: getCube() ) {
+            initStateMap[x-46]=index;
+            index++;
         }
     }
 
@@ -43,7 +51,19 @@ public class Rotations {
         }
         return newArray; 
     }
-    
+
+
+    public float getManhattenHeuristic(){
+        int sum = 0;
+        int index = 0;
+        for (Integer x: getCube() ) {
+            int initIndex = initStateMap[x-46];
+            sum += abs(initIndex/9-index/9)+abs(initIndex/3-index/3)+abs(initIndex%3-index%3);
+            index++;
+        }
+        return sum/8;
+    }
+
     public void setCube(List<Integer> order){
         int index=0;
         for(int f = 0; f < 3; f++){
