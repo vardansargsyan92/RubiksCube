@@ -20,9 +20,9 @@ public class Rotations {
     - last 9 indexes are from (B)Back, from top left (G/R/W) to down right (G/Y/O)
     */
     
-    private final int[][][] cube={{{50,51,52},{49,54,53},{59,48,46}},
-                                  {{58,55,60},{57,62,61},{47,56,63}},
-                                  {{67,64,69},{66,71,70},{68,65,72}}};
+    private final int[][][] cube={{{50,51,52},{49,54,53},{59,48,46}}, // 54 = blue
+                                  {{58,55,60},{57,62,61},{47,56,63}}, // 55 = white, 57 = red, 61 = orange, 56 = yellow
+                                  {{67,64,69},{66,71,70},{68,65,72}}}; // 71 = green
     private final int[][][] tempCube=new int[3][3][3];
     private int[] initStateMap = new int[27];
 

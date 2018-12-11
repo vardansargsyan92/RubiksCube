@@ -362,6 +362,99 @@ public class Rubik {
         doSequence(sb.toString().trim());
     }
 
+//
+//    public char[][] getInitialState() {
+//        char[][] initialState = new char[6][9];
+//        for (int i = 0; i < 6; i++) {
+//            for(int j = 0; j < 9; j++) {
+//                switch (i) {
+//                    case 0:
+//                        initialState[i][j] = 'L';
+//                        break;
+//                    case 1:
+//                        initialState[i][j] = 'U';
+//                        break;
+//                    case 2:
+//                        initialState[i][j] = 'F';
+//                        break;
+//                    case 3:
+//                        initialState[i][j] = 'D';
+//                        break;
+//                    case 4:
+//                        initialState[i][j] = 'R';
+//                        break;
+//                    case 5:
+//                        initialState[i][j] = 'B';
+//                        break;
+//                }
+//            }
+//        }
+//        return initialState;
+//    }
+//
+//    public char[][] getState() {
+//        char[][] state = getInitialState();
+//
+//        for (int i = 0; i < sequence.size(); i++) {
+//            state = applyMovement(sequence.get(i), state);
+//        }
+//
+//        return state;
+//    }
+//
+//    public char[][] applyMovement(String move, char[][] currentState) {
+//        "F", "Fi", "F2", "R", "Ri", "R2",
+//                "B", "Bi", "B2", "L", "Li", "L2",
+//                "U", "Ui", "U2", "D", "Di", "D2"; L-0R, U-1W, F-2B, D-3Y, R-4O, B-5G
+//
+//        char[][] newState = currentState;
+//
+//        switch (move) {
+//            case "F":
+//                newState[0][2] = currentState[3][0];
+//                newState[0][5] = currentState[3][1];
+//                newState[0][8] = currentState[3][2];
+//
+//                newState[]
+//        }
+//    }
+
+    private String checkChar(String l1, char a) {
+        switch (a) {
+            case 'R':
+                l1 = l1.concat("L");
+                break;
+            case 'L':
+                l1 = l1.concat("R");
+                break;
+            case 'U':
+                l1 = l1.concat("B");
+                break;
+            case 'D':
+                l1 = l1.concat("F");
+                break;
+            case 'B':
+                l1 = l1.concat("U");
+                break;
+            case 'F':
+                l1 = l1.concat("D");
+                break;
+            default:
+                l1 = l1.concat(String.valueOf(a));
+                break;
+        }
+        return l1;
+    }
+
+    public void runSequence(String list) {
+        String l1 = new String();
+        for (int i = 0; i < list.length(); i++) {
+            l1 = checkChar(l1, list.charAt(i));
+        }
+
+        doSequence(l1);
+    }
+
     public void doSequence(String list) {
         onScrambling.set(true);
         sequence = Utils.unifyNotation(list);
