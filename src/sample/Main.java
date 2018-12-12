@@ -155,10 +155,11 @@ public class Main extends Application {
 			while (result.startsWith("Error 8")) {
 				result = search.next();
 			}
-			System.out.println("Solution sequence");
-			System.out.println(String.format("%s\n", result));
 
 			rubik.doSequence(result);
+
+            System.out.println("Solution sequence");
+            System.out.println(String.format("%s\n", result));
         });
 
 

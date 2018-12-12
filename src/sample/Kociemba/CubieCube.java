@@ -33,10 +33,10 @@ class CubieCube {
 	static char[] PermInvEdgeSym = new char[CoordCube.N_PERM_SYM];
 
 	/**
-	 * Notice that Edge Perm Coordnate and Corner Perm Coordnate are the same symmetry structure.
+	 * Notice that Edge Perm Coordinate and Corner Perm Coordinate are the same symmetry structure.
 	 * So their ClassIndexToRepresentantArray are the same.
-	 * And when x is RawEdgePermCoordnate, y*16+k is SymEdgePermCoordnate, y*16+(k^e2c[k]) will
-	 * be the SymCornerPermCoordnate of the State whose RawCornerPermCoordnate is x.
+	 * And when x is RawEdgePermCoordnate, y*16+k is SymEdgePermCoordinate, y*16+(k^e2c[k]) will
+	 * be the SymCornerPermCoordinate of the State whose RawCornerPermCoordinate is x.
 	 */
 	// static byte[] e2c = {0, 0, 0, 0, 1, 3, 1, 3, 1, 3, 1, 3, 0, 0, 0, 0};
 	static final int SYM_E2C_MAGIC = 0x00DDDD00;
@@ -45,19 +45,19 @@ class CubieCube {
 	}
 
 	/**
-	 * Raw-Coordnate to Sym-Coordnate, only for speeding up initializaion.
+	 * Raw-Coordinate to Sym-Coordinate, only for speeding up initializaion.
 	 */
 	static byte[] FlipR2S = new byte[CoordCube.N_FLIP_HALF + CoordCube.N_FLIP];
 	static byte[] TwistR2S = new byte[CoordCube.N_TWIST_HALF + CoordCube.N_TWIST];
 	static byte[] EPermR2S = new byte[CoordCube.N_PERM_HALF];
-	static char[] FlipS2RF = KociembaSearch.USE_TWIST_FLIP_PRUN ? new char[CoordCube.N_FLIP_SYM * 8] : null;
+	static char[] FlipS2RF = new char[CoordCube.N_FLIP_SYM * 8];
 
 	/**
 	 *
 	 */
-	static char[] SymStateTwist;// = new char[CoordCube.N_TWIST_SYM];
-	static char[] SymStateFlip;// = new char[CoordCube.N_FLIP_SYM];
-	static char[] SymStatePerm;// = new char[CoordCube.N_PERM_SYM];
+	static char[] SymStateTwist;
+	static char[] SymStateFlip;
+	static char[] SymStatePerm;
 
 	static CubieCube urf1 = new CubieCube(2531, 1373, 67026819, 1367);
 	static CubieCube urf2 = new CubieCube(2089, 1906, 322752913, 2040);
@@ -70,8 +70,8 @@ class CubieCube {
 			{5, 4, 3, 8, 7, 6, 2, 1, 0, 14, 13, 12, 17, 16, 15, 11, 10, 9}
 	};
 
-	byte[] ca = {0, 1, 2, 3, 4, 5, 6, 7};
-	byte[] ea = {0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22};
+	byte[] ca = {0, 1, 2, 3, 4, 5, 6, 7}; // corners
+	byte[] ea = {0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22}; //edges
 	CubieCube temps = null;
 
 	CubieCube() {
@@ -311,46 +311,6 @@ class CubieCube {
 		Util.setComb(ca, idx, 0, false);
 	}
 
-	/**
-	 * Check a cubiecube for solvability. Return the error code.
-	 * 0: Cube is solvable
-	 * -2: Not all 12 edges exist exactly once
-	 * -3: Flip error: One edge has to be flipped
-	 * -4: Not all corners exist exactly once
-	 * -5: Twist error: One corner has to be twisted
-	 * -6: Parity error: Two corners or two edges have to be exchanged
-	 */
-	int verify() {
-		int sum = 0;
-		int edgeMask = 0;
-		for (int e = 0; e < 12; e++) {
-			edgeMask |= 1 << (ea[e] >> 1);
-			sum ^= ea[e] & 1;
-		}
-		if (edgeMask != 0xfff) {
-			return -2;// missing edges
-		}
-		if (sum != 0) {
-			return -3;
-		}
-		int cornMask = 0;
-		sum = 0;
-		for (int c = 0; c < 8; c++) {
-			cornMask |= 1 << (ca[c] & 7);
-			sum += ca[c] >> 3;
-		}
-		if (cornMask != 0xff) {
-			return -4;// missing corners
-		}
-		if (sum % 3 != 0) {
-			return -5;// twisted corner
-		}
-		if ((Util.getNParity(Util.getNPerm(ea, 12, true), 12) ^ Util.getNParity(getCPerm(), 8)) != 0) {
-			return -6;// parity error
-		}
-		return 0;// cube ok
-	}
-
 	long selfSymmetry() {
 		CubieCube c = new CubieCube(this);
 		CubieCube d = new CubieCube();
@@ -504,7 +464,7 @@ class CubieCube {
 					case 2: idx = d.getEPerm();
 						break;
 				}
-				if (coord == 0 && KociembaSearch.USE_TWIST_FLIP_PRUN) {
+				if (coord == 0) {
 					FlipS2RF[count << 3 | s >> 1] = (char) idx;
 				}
 				if (idx == i) {
@@ -539,7 +499,7 @@ class CubieCube {
 		CubieCube cc = new CubieCube();
 		for (int i = 0; i < CoordCube.N_PERM_SYM; i++) {
 			cc.setEPerm(EPermS2R[i]);
-			Perm2CombP[i] = (byte) (Util.getComb(cc.ea, 0, true) + (KociembaSearch.USE_COMBP_PRUN ? Util.getNParity(EPermS2R[i], 8) * 70 : 0));
+			Perm2CombP[i] = (byte) (Util.getComb(cc.ea, 0, true) + Util.getNParity(EPermS2R[i], 8) * 70);
 			cc.invCubieCube();
 			PermInvEdgeSym[i] = (char) cc.getEPermSym();
 		}

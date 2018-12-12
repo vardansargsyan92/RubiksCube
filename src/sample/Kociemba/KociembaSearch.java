@@ -1,28 +1,13 @@
 package sample.Kociemba;
 
 public class KociembaSearch {
-	public static final boolean USE_TWIST_FLIP_PRUN = true;
-
-	/**
-	 * If this variable is set, only a few entries of the pruning table will be initialized.
-	 * Hence, the initialization time will be decreased by about 50%, however, the speed
-	 * of the solver is affected.
-	 * 0: without partial initialization
-	 * 1: enable partial initialization, and the initialization will continue during solving
-	 * 2: enable partial initialization, and the initialization will not continue
-	 */
-	public static final int PARTIAL_INIT_LEVEL = 0;
 
 	//Options for research purpose.
 	static final int MOVE_NUMBER = 21; //  defines the maximal allowed maneuver length\
 	static final int PROBE_MAX = 100; // the maximum number of the probes of phase 2
 	static final int PROBE_MIN = 0; // the minimum number of the probes of phase 2
 	static final int MAX_PRE_MOVES = 20;
-	static final boolean TRY_INVERSE = true;
-	static final boolean TRY_THREE_AXES = true;
 
-	static final boolean USE_COMBP_PRUN = USE_TWIST_FLIP_PRUN;
-	static final boolean USE_CONJ_PRUN = USE_TWIST_FLIP_PRUN;
 	protected static int MIN_P1LENGTH_PRE = 7;
 	protected static int MAX_DEPTH2 = 13;
 
@@ -60,9 +45,6 @@ public class KociembaSearch {
 	CubieCube phase2Cubie;
 
 	protected boolean isRec = false;
-
-	public static final int OPTIMAL_SOLUTION = 0x8;
-
 
 	public KociembaSearch() {
 		for (int i = 0; i < 21; i++) {
@@ -123,9 +105,9 @@ public class KociembaSearch {
 	 *      Error 8: Probe limit exceeded, no solution within given probMax
 	 */
 	public synchronized String solution(String facelets) {
-		int check = verify(facelets);
-		if (check != 0) {
-			return "Error " + Math.abs(check);
+		boolean check = initCube(facelets);
+		if (!check) {
+			return "Error";
 		}
 		this.sol = MOVE_NUMBER;
 		this.probe = 0;
@@ -142,7 +124,7 @@ public class KociembaSearch {
 	}
 
 	protected void initSearch() {
-		conjMask = (TRY_INVERSE ? 0 : 0x38) | (TRY_THREE_AXES ? 0 : 0x36);
+		conjMask = 0;
 		selfSym = cc.selfSymmetry();
 		conjMask |= (selfSym >> 16 & 0xffff) != 0 ? 0x12 : 0;
 		conjMask |= (selfSym >> 32 & 0xffff) != 0 ? 0x24 : 0;
@@ -181,10 +163,10 @@ public class KociembaSearch {
 		inited = true;
 	}
 
-	int verify(String facelets) {
+	boolean initCube(String facelets) {
 		int count = 0x000000;
 		byte[] f = new byte[54];
-		try {
+
 			String center = new String(
 					new char[] {
 							facelets.charAt(Util.U5),
@@ -197,19 +179,15 @@ public class KociembaSearch {
 			);
 			for (int i = 0; i < 54; i++) {
 				f[i] = (byte) center.indexOf(facelets.charAt(i));
-				if (f[i] == -1) {
-					return -1;
-				}
 				count += 1 << (f[i] << 2);
 			}
-		} catch (Exception e) {
-			return -1;
-		}
+
 		if (count != 0x999999) {
-			return -1;
+			return false;
 		}
 		Util.toCubieCube(f, cc);
-		return cc.verify();
+
+		return true;
 	}
 
 	protected int phase1PreMoves(int maxl, int lm, CubieCube cc, int ssym) {
@@ -267,7 +245,7 @@ public class KociembaSearch {
 				}
 			}
 		}
-		return solution == null ? "Error 7" : solution;
+		return solution == null ? "Error" : solution;
 	}
 
 	protected int initPhase2Pre() {
@@ -383,14 +361,13 @@ public class KociembaSearch {
 					continue;
 				}
 
-				if (USE_CONJ_PRUN) {
-					prun = nodeUD[maxl].doMovePrunConj(node, m);
-					if (prun > maxl) {
-						break;
-					} else if (prun == maxl) {
-						continue;
-					}
+				prun = nodeUD[maxl].doMovePrunConj(node, m);
+				if (prun > maxl) {
+					break;
+				} else if (prun == maxl) {
+					continue;
 				}
+
 
 				move[depth1 - maxl] = m;
 				valid1 = Math.min(valid1, depth1 - maxl);
@@ -399,107 +376,6 @@ public class KociembaSearch {
 					return 0;
 				} else if (ret == 2) {
 					break;
-				}
-			}
-		}
-		return 1;
-	}
-
-	protected String searchopt() {
-		int maxprun1 = 0;
-		int maxprun2 = 0;
-		for (int i = 0; i < 6; i++) {
-			urfCoordCube[i].calcPruning(false);
-			if (i < 3) {
-				maxprun1 = Math.max(maxprun1, urfCoordCube[i].prun);
-			} else {
-				maxprun2 = Math.max(maxprun2, urfCoordCube[i].prun);
-			}
-		}
-		urfIdx = maxprun2 > maxprun1 ? 3 : 0;
-		phase1Cubie[0] = urfCubieCube[urfIdx];
-		for (length1 = isRec ? length1 : 0; length1 < sol; length1++) {
-			CoordCube ud = urfCoordCube[0 + urfIdx];
-			CoordCube rl = urfCoordCube[1 + urfIdx];
-			CoordCube fb = urfCoordCube[2 + urfIdx];
-
-			if (ud.prun <= length1 && rl.prun <= length1 && fb.prun <= length1
-					&& phase1opt(ud, rl, fb, selfSym, length1, -1) == 0) {
-				return solution == null ? "Error 8" : solution;
-			}
-		}
-		return solution == null ? "Error 7" : solution;
-	}
-
-	/**
-	 * @return
-	 *      0: Found or Probe limit exceeded
-	 *      1: Try Next Power
-	 *      2: Try Next Axis
-	 */
-	protected int phase1opt(CoordCube ud, CoordCube rl, CoordCube fb, long ssym, int maxl, int lm) {
-		if (ud.prun == 0 && rl.prun == 0 && fb.prun == 0 && maxl < 5) {
-			maxDep2 = maxl + 1;
-			depth1 = length1 - maxl;
-			return initPhase2Pre() == 0 ? 0 : 1;
-		}
-
-		int skipMoves = CubieCube.getSkipMoves(ssym);
-
-		for (int axis = 0; axis < 18; axis += 3) {
-			if (axis == lm || axis == lm - 9) {
-				continue;
-			}
-			for (int power = 0; power < 3; power++) {
-				int m = axis + power;
-
-				if (isRec && m != move[length1 - maxl]
-						|| skipMoves != 0 && (skipMoves & 1 << m) != 0) {
-					continue;
-				}
-
-				// UD Axis
-				int prun_ud = Math.max(nodeUD[maxl].doMovePrun(ud, m, false),
-						USE_CONJ_PRUN ? nodeUD[maxl].doMovePrunConj(ud, m) : 0);
-				if (prun_ud > maxl) {
-					break;
-				} else if (prun_ud == maxl) {
-					continue;
-				}
-
-				// RL Axis
-				m = CubieCube.urfMove[2][m];
-
-				int prun_rl = Math.max(nodeRL[maxl].doMovePrun(rl, m, false),
-						USE_CONJ_PRUN ? nodeRL[maxl].doMovePrunConj(rl, m) : 0);
-				if (prun_rl > maxl) {
-					break;
-				} else if (prun_rl == maxl) {
-					continue;
-				}
-
-				// FB Axis
-				m = CubieCube.urfMove[2][m];
-
-				int prun_fb = Math.max(nodeFB[maxl].doMovePrun(fb, m, false),
-						USE_CONJ_PRUN ? nodeFB[maxl].doMovePrunConj(fb, m) : 0);
-				if (prun_ud == prun_rl && prun_rl == prun_fb && prun_fb != 0) {
-					prun_fb++;
-				}
-
-				if (prun_fb > maxl) {
-					break;
-				} else if (prun_fb == maxl) {
-					continue;
-				}
-
-				m = CubieCube.urfMove[2][m];
-
-				move[length1 - maxl] = m;
-				valid1 = Math.min(valid1, length1 - maxl);
-				int ret = phase1opt(nodeUD[maxl], nodeRL[maxl], nodeFB[maxl], ssym & CubieCube.moveCubeSym[m], maxl - 1, axis);
-				if (ret == 0) {
-					return 0;
 				}
 			}
 		}

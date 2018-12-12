@@ -15,8 +15,8 @@ class CoordCube {
 	static final int N_PERM_HALF = (N_PERM + 1) / 2;
 	static final int N_PERM_SYM = 2768;
 	static final int N_MPERM = 24;
-	static final int N_COMB = KociembaSearch.USE_COMBP_PRUN ? 140 : 70;
-	static final int P2_PARITY_MOVE = KociembaSearch.USE_COMBP_PRUN ? 0xA5 : 0;
+	static final int N_COMB = 140;
+	static final int P2_PARITY_MOVE = 0xA5;
 
 	//phase1
 	static char[][] UDSliceMove = new char[N_SLICE][N_MOVES];
@@ -25,14 +25,14 @@ class CoordCube {
 	static char[][] UDSliceConj = new char[N_SLICE][8];
 	static int[] UDSliceTwistPrun = new int[N_SLICE * N_TWIST_SYM / 8 + 1];
 	static int[] UDSliceFlipPrun = new int[N_SLICE * N_FLIP_SYM / 8 + 1];
-	static int[] TwistFlipPrun = KociembaSearch.USE_TWIST_FLIP_PRUN ? new int[N_FLIP * N_TWIST_SYM / 8 + 1] : null;
+	static int[] TwistFlipPrun = new int[N_FLIP * N_TWIST_SYM / 8 + 1];
 
 	//phase2
 	static char[][] CPermMove = new char[N_PERM_SYM][N_MOVES2];
 	static char[][] EPermMove = new char[N_PERM_SYM][N_MOVES2];
 	static char[][] MPermMove = new char[N_MPERM][N_MOVES2];
 	static char[][] MPermConj = new char[N_MPERM][16];
-	static char[][] CCombPMove;// = new char[N_COMB][N_MOVES2];
+	static char[][] CCombPMove;
 	static char[][] CCombPConj = new char[N_COMB][16];
 	static int[] MCPermPrun = new int[N_MPERM * N_PERM_SYM / 8 + 1];
 	static int[] EPermCCombPPrun = new int[N_COMB * N_PERM_SYM / 8 + 1];
@@ -79,9 +79,8 @@ class CoordCube {
 		initedPrun = (initedPrun || isFirst) && initPermCombPPrun();
 		initedPrun = (initedPrun || isFirst) && initSliceTwistPrun();
 		initedPrun = (initedPrun || isFirst) && initSliceFlipPrun();
-		if (KociembaSearch.USE_TWIST_FLIP_PRUN) {
-			initedPrun = (initedPrun || isFirst) && initTwistFlipPrun();
-		}
+		initedPrun = (initedPrun || isFirst) && initTwistFlipPrun();
+
 		return initedPrun;
 	}
 
@@ -392,11 +391,9 @@ class CoordCube {
 								twist * N_SLICE + UDSliceConj[slice][tsym]),
 						getPruning(UDSliceFlipPrun,
 								flip * N_SLICE + UDSliceConj[slice][fsym])),
-				Math.max(
-						KociembaSearch.USE_CONJ_PRUN ? getPruning(TwistFlipPrun,
-								(twistc >> 3) << 11 | CubieCube.FlipS2RF[flipc ^ (twistc & 7)]) : 0,
-						KociembaSearch.USE_TWIST_FLIP_PRUN ? getPruning(TwistFlipPrun,
-								twist << 11 | CubieCube.FlipS2RF[flip << 3 | (fsym ^ tsym)]) : 0));
+				Math.max(getPruning(TwistFlipPrun,
+								(twistc >> 3) << 11 | CubieCube.FlipS2RF[flipc ^ (twistc & 7)]),
+						 getPruning(TwistFlipPrun, twist << 11 | CubieCube.FlipS2RF[flip << 3 | (fsym ^ tsym)])));
 	}
 
 	boolean setWithPrun(CubieCube cc, int depth) {
@@ -405,8 +402,8 @@ class CoordCube {
 		tsym = twist & 7;
 		twist = twist >> 3;
 
-		prun = KociembaSearch.USE_TWIST_FLIP_PRUN ? getPruning(TwistFlipPrun,
-				twist << 11 | CubieCube.FlipS2RF[flip ^ tsym]) : 0;
+		prun =  getPruning(TwistFlipPrun,
+				twist << 11 | CubieCube.FlipS2RF[flip ^ tsym]);
 		if (prun > depth) {
 			return false;
 		}
@@ -424,16 +421,15 @@ class CoordCube {
 			return false;
 		}
 
-		if (KociembaSearch.USE_CONJ_PRUN) {
-			CubieCube pc = new CubieCube();
-			CubieCube.CornConjugate(cc, 1, pc);
-			CubieCube.EdgeConjugate(cc, 1, pc);
-			twistc = pc.getTwistSym();
-			flipc = pc.getFlipSym();
-			prun = Math.max(prun,
-					getPruning(TwistFlipPrun,
-							(twistc >> 3) << 11 | CubieCube.FlipS2RF[flipc ^ (twistc & 7)]));
-		}
+		CubieCube pc = new CubieCube();
+		CubieCube.CornConjugate(cc, 1, pc);
+		CubieCube.EdgeConjugate(cc, 1, pc);
+		twistc = pc.getTwistSym();
+		flipc = pc.getFlipSym();
+		prun = Math.max(prun,
+				getPruning(TwistFlipPrun,
+						(twistc >> 3) << 11 | CubieCube.FlipS2RF[flipc ^ (twistc & 7)]));
+
 
 		return prun <= depth;
 	}
@@ -457,9 +453,8 @@ class CoordCube {
 						getPruning(UDSliceTwistPrun,
 								twist * N_SLICE + UDSliceConj[slice][tsym]),
 						getPruning(UDSliceFlipPrun,
-								flip * N_SLICE + UDSliceConj[slice][fsym])),
-				KociembaSearch.USE_TWIST_FLIP_PRUN ? getPruning(TwistFlipPrun,
-						twist << 11 | CubieCube.FlipS2RF[flip << 3 | (fsym ^ tsym)]) : 0);
+								flip * N_SLICE + UDSliceConj[slice][fsym])), getPruning(TwistFlipPrun,
+						twist << 11 | CubieCube.FlipS2RF[flip << 3 | (fsym ^ tsym)]));
 		return prun;
 	}
 
