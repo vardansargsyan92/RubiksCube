@@ -122,8 +122,7 @@ public class Main extends Application {
         idaSearchButton.setOnAction(e -> {
             //TODO IDA* search
             //TODO test
-            String str = "D D Ri D D R R L Di L L R B B R D D U B B U Fi D F Li Ui Fi L Di L U U Di";
-            rubik.doSequence(str);
+            // will not work, couldn't solve the issues
         });
 
 

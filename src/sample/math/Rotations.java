@@ -53,7 +53,7 @@ public class Rotations {
     }
 
 
-    public float getManhattenHeuristic(){
+    public int getManhattenHeuristic(){
         int sum = 0;
         int index = 0;
         for (Integer x: getCube() ) {
