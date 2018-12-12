@@ -20,6 +20,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import sample.Basic.Cube;
+import sample.Kociemba.KociembaSearch;
 import sample.model.Move;
 import sample.model.Moves;
 import sample.model.Rubik;
@@ -135,12 +136,29 @@ public class Main extends Application {
          */
         Button kociembaSearchButton = new Button("Kociemba");
         kociembaSearchButton.setOnAction(e -> {
-            //TODO Kociemba search method
-            List<Integer> flattenRotations = rubik.getRotations().getCube();
-            //TODO test
-            Utils.getMovements();
-//            String str = "D D Ri D D R R L Di L L R B B R D D U B B U Fi D F Li Ui Fi L Di L U U Di";
-//            rubik.doSequence(str);
+//			rubik.doSequence("D D Ri D D R R L Di L L R B B R D D U B B U Fi D F Li Ui Fi L Di L U U Di");
+			String[][] state = rubik.getState();
+			StringBuffer s = new StringBuffer(54);
+
+			for (int i = 0; i < 54; i++)
+				s.insert(i, 'B');
+
+			for (int i = 0; i < state.length; i++) {
+				for (int j =0; j < state[i].length; j++) {
+					s.setCharAt(9 * i + j, state[i][j].charAt(0));
+				}
+			}
+			String stateForKociemba = s.toString();
+
+			KociembaSearch search = new KociembaSearch();
+			String result = search.solution(stateForKociemba);
+			while (result.startsWith("Error 8")) {
+				result = search.next();
+			}
+			System.out.println("Solution sequence");
+			System.out.println(String.format("%s\n", result));
+
+			rubik.doSequence(result);
         });
 
 

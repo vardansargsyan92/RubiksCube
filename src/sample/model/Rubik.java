@@ -85,6 +85,8 @@ public class Rubik {
     private static final int MOUSE_RELEASED = 3;
     private final IntegerProperty mouse = new SimpleIntegerProperty(MOUSE_OUT);
 
+    private List<String> appliedMoves = new ArrayList<>();
+
     public Rubik() {
         /*
         Import Rubik's Cube model and arrows
@@ -232,6 +234,8 @@ public class Rubik {
             // check if solved
             solved.set(Utils.checkSolution(order));
         }
+
+        appliedMoves.add(btRot);
     }
 
     // arrow over face or axis to guide user with direction of rotation, complementary with preview
@@ -490,6 +494,387 @@ public class Rubik {
         rotateFace(sequence.get(0));
     }
 
+    private String getFaceName(int i) {
+        switch (i) {
+            case 0:
+                return "U";
+            case 1:
+                return "R";
+            case 2:
+                return "F";
+            case 3:
+                return "D";
+            case 4:
+                return "L";
+            case 5:
+                return "B";
+        }
+        return "";
+    }
+
+    public String[][] getState(){
+        String[][] state = new String[6][9];
+        for (int i = 0; i < 6; i++) {
+            String color = getFaceName(i);
+            for (int j = 0; j < 9; j++) {
+                state[i][j] = color;
+            }
+        }
+
+        for (int i = 0; i < sequence.size(); i++) {
+            state = processSingleMove(sequence.get(i), state);
+        }
+
+        return state;
+    }
+
+    private String[][] copyState(String[][] state) {
+        String[][] copy = new String[6][9];
+        for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < 9; j++) {
+                copy[i][j] = state[i][j];
+            }
+        }
+
+        return copy;
+    }
+
+    private String[][] processSingleMove(String move, String[][] state) {
+        String[][] newState = copyState(state);
+        switch (move) {
+            case "U":
+                newState[4][0] = state[2][0];
+                newState[4][1] = state[2][1];
+                newState[4][2] = state[2][2];
+
+                newState[2][0] = state[1][0];
+                newState[2][1] = state[1][1];
+                newState[2][2] = state[1][2];
+
+                newState[1][0] = state[5][0];
+                newState[1][1] = state[5][1];
+                newState[1][2] = state[5][2];
+
+                newState[5][0] = state[4][0];
+                newState[5][1] = state[4][1];
+                newState[5][2] = state[4][2];
+
+                newState[0][0] = state[0][6];
+                newState[0][1] = state[0][3];
+                newState[0][2] = state[0][0];
+                newState[0][3] = state[0][7];
+                newState[0][4] = state[0][4];
+                newState[0][5] = state[0][1];
+                newState[0][6] = state[0][8];
+                newState[0][7] = state[0][5];
+                newState[0][8] = state[0][2];
+                break;
+            case "Ui":
+                newState[4][0] = state[5][0];
+                newState[4][1] = state[5][1];
+                newState[4][2] = state[5][2];
+
+                newState[2][0] = state[4][0];
+                newState[2][1] = state[4][1];
+                newState[2][2] = state[4][2];
+
+                newState[1][0] = state[2][0];
+                newState[1][1] = state[2][1];
+                newState[1][2] = state[2][2];
+
+                newState[5][0] = state[1][0];
+                newState[5][1] = state[1][1];
+                newState[5][2] = state[1][2];
+
+                newState[0][0] = state[0][2];
+                newState[0][1] = state[0][5];
+                newState[0][2] = state[0][8];
+                newState[0][3] = state[0][1];
+                newState[0][4] = state[0][4];
+                newState[0][5] = state[0][7];
+                newState[0][6] = state[0][0];
+                newState[0][7] = state[0][3];
+                newState[0][8] = state[0][6];
+                break;
+
+            case "D":
+                newState[4][6] = state[5][6];
+                newState[4][7] = state[5][7];
+                newState[4][8] = state[5][8];
+
+                newState[2][6] = state[4][6];
+                newState[2][7] = state[4][7];
+                newState[2][8] = state[4][8];
+
+                newState[1][6] = state[2][6];
+                newState[1][7] = state[2][7];
+                newState[1][8] = state[2][8];
+
+                newState[5][6] = state[1][6];
+                newState[5][7] = state[1][7];
+                newState[5][8] = state[1][8];
+
+                newState[3][0] = state[3][6];
+                newState[3][1] = state[3][3];
+                newState[3][2] = state[3][0];
+                newState[3][3] = state[3][7];
+                newState[3][4] = state[3][4];
+                newState[3][5] = state[3][1];
+                newState[3][6] = state[3][8];
+                newState[3][7] = state[3][5];
+                newState[3][8] = state[3][2];
+                break;
+            case "Di":
+                newState[4][6] = state[2][6];
+                newState[4][7] = state[2][7];
+                newState[4][8] = state[2][8];
+
+                newState[2][6] = state[1][6];
+                newState[2][7] = state[1][7];
+                newState[2][8] = state[1][8];
+
+                newState[1][6] = state[5][6];
+                newState[1][7] = state[5][7];
+                newState[1][8] = state[5][8];
+
+                newState[5][6] = state[4][6];
+                newState[5][7] = state[4][7];
+                newState[5][8] = state[4][8];
+
+                newState[3][0] = state[3][2];
+                newState[3][1] = state[3][5];
+                newState[3][2] = state[3][8];
+                newState[3][3] = state[3][1];
+                newState[3][4] = state[3][4];
+                newState[3][5] = state[3][7];
+                newState[3][6] = state[3][0];
+                newState[3][7] = state[3][3];
+                newState[3][8] = state[3][6];
+                break;
+
+            case "F":
+                newState[0][6] = state[4][8];
+                newState[0][7] = state[4][5];
+                newState[0][8] = state[4][2];
+
+                newState[4][2] = state[3][0];
+                newState[4][5] = state[3][1];
+                newState[4][8] = state[3][2];
+
+                newState[3][0] = state[1][6];
+                newState[3][1] = state[1][3];
+                newState[3][2] = state[1][0];
+
+                newState[1][0] = state[0][6];
+                newState[1][3] = state[0][7];
+                newState[1][6] = state[0][8];
+
+                newState[2][0] = state[2][6];
+                newState[2][1] = state[2][3];
+                newState[2][2] = state[2][0];
+                newState[2][3] = state[2][7];
+                newState[2][4] = state[2][4];
+                newState[2][5] = state[2][1];
+                newState[2][6] = state[2][8];
+                newState[2][7] = state[2][5];
+                newState[2][8] = state[2][2];
+                break;
+            case "Fi":
+                newState[0][6] = state[1][0];
+                newState[0][7] = state[1][3];
+                newState[0][8] = state[1][6];
+
+                newState[4][2] = state[0][8];
+                newState[4][5] = state[0][7];
+                newState[4][8] = state[0][6];
+
+                newState[3][0] = state[4][2];
+                newState[3][1] = state[4][5];
+                newState[3][2] = state[4][8];
+
+                newState[1][0] = state[3][2];
+                newState[1][3] = state[3][1];
+                newState[1][6] = state[3][0];
+
+                newState[2][0] = state[2][2];
+                newState[2][1] = state[2][5];
+                newState[2][2] = state[2][8];
+                newState[2][3] = state[2][1];
+                newState[2][4] = state[2][4];
+                newState[2][5] = state[2][7];
+                newState[2][6] = state[2][0];
+                newState[2][7] = state[2][3];
+                newState[2][8] = state[2][6];
+                break;
+
+            case "B":
+                newState[0][2] = state[1][8];
+                newState[0][1] = state[1][5];
+                newState[0][0] = state[1][2];
+
+                newState[4][0] = state[0][2];
+                newState[4][3] = state[0][1];
+                newState[4][6] = state[0][0];
+
+                newState[3][8] = state[4][6];
+                newState[3][7] = state[4][3];
+                newState[3][6] = state[4][0];
+
+                newState[1][2] = state[3][8];
+                newState[1][5] = state[3][7];
+                newState[1][8] = state[3][6];
+
+                newState[5][0] = state[5][6];
+                newState[5][1] = state[5][3];
+                newState[5][2] = state[5][0];
+                newState[5][3] = state[5][7];
+                newState[5][4] = state[5][4];
+                newState[5][5] = state[5][1];
+                newState[5][6] = state[5][8];
+                newState[5][7] = state[5][5];
+                newState[5][8] = state[5][2];
+                break;
+            case "Bi":
+                newState[0][2] = state[4][0];
+                newState[0][1] = state[4][3];
+                newState[0][0] = state[4][6];
+
+                newState[4][0] = state[3][6];
+                newState[4][3] = state[3][7];
+                newState[4][6] = state[3][8];
+
+                newState[3][8] = state[1][2];
+                newState[3][7] = state[1][5];
+                newState[3][6] = state[1][8];
+
+                newState[1][2] = state[0][0];
+                newState[1][5] = state[0][1];
+                newState[1][8] = state[0][2];
+
+                newState[5][0] = state[5][2];
+                newState[5][1] = state[5][5];
+                newState[5][2] = state[5][8];
+                newState[5][3] = state[5][1];
+                newState[5][4] = state[5][4];
+                newState[5][5] = state[5][7];
+                newState[5][6] = state[5][0];
+                newState[5][7] = state[5][3];
+                newState[5][8] = state[5][6];
+                break;
+
+            case "L":
+                newState[0][0] = state[5][8];
+                newState[0][3] = state[5][5];
+                newState[0][6] = state[5][2];
+
+                newState[2][0] = state[0][0];
+                newState[2][3] = state[0][3];
+                newState[2][6] = state[0][6];
+
+                newState[3][0] = state[2][0];
+                newState[3][3] = state[2][3];
+                newState[3][6] = state[2][6];
+
+                newState[5][2] = state[3][6];
+                newState[5][5] = state[3][3];
+                newState[5][8] = state[3][0];
+
+                newState[4][0] = state[4][6];
+                newState[4][1] = state[4][3];
+                newState[4][2] = state[4][0];
+                newState[4][3] = state[4][7];
+                newState[4][4] = state[4][4];
+                newState[4][5] = state[4][1];
+                newState[4][6] = state[4][8];
+                newState[4][7] = state[4][5];
+                newState[4][8] = state[4][2];
+                break;
+            case "Li":
+                newState[0][0] = state[2][0];
+                newState[0][3] = state[2][3];
+                newState[0][6] = state[2][6];
+
+                newState[2][0] = state[3][0];
+                newState[2][3] = state[3][3];
+                newState[2][6] = state[3][6];
+
+                newState[3][6] = state[5][2];
+                newState[3][3] = state[5][5];
+                newState[3][0] = state[5][8];
+
+                newState[5][2] = state[0][6];
+                newState[5][5] = state[0][3];
+                newState[5][8] = state[0][0];
+
+                newState[4][0] = state[4][2];
+                newState[4][1] = state[4][5];
+                newState[4][2] = state[4][8];
+                newState[4][3] = state[4][1];
+                newState[4][4] = state[4][4];
+                newState[4][5] = state[4][7];
+                newState[4][6] = state[4][0];
+                newState[4][7] = state[4][3];
+                newState[4][8] = state[4][6];
+                break;
+
+            case "R":
+                newState[0][8] = state[2][8];
+                newState[0][5] = state[2][5];
+                newState[0][2] = state[2][2];
+
+                newState[2][2] = state[3][2];
+                newState[2][5] = state[3][5];
+                newState[2][8] = state[3][8];
+
+                newState[3][2] = state[5][6];
+                newState[3][5] = state[5][3];
+                newState[3][8] = state[5][0];
+
+                newState[5][0] = state[0][8];
+                newState[5][3] = state[0][5];
+                newState[5][6] = state[0][2];
+
+                newState[1][0] = state[1][6];
+                newState[1][1] = state[1][3];
+                newState[1][2] = state[1][0];
+                newState[1][3] = state[1][7];
+                newState[1][4] = state[1][4];
+                newState[1][5] = state[1][1];
+                newState[1][6] = state[1][8];
+                newState[1][7] = state[1][5];
+                newState[1][8] = state[1][2];
+                break;
+            case "Ri":
+                newState[0][8] = state[5][0];
+                newState[0][5] = state[5][3];
+                newState[0][2] = state[5][6];
+
+                newState[2][2] = state[0][2];
+                newState[2][5] = state[0][5];
+                newState[2][8] = state[0][8];
+
+                newState[3][2] = state[2][2];
+                newState[3][5] = state[2][5];
+                newState[3][8] = state[2][8];
+
+                newState[5][0] = state[3][8];
+                newState[5][3] = state[3][5];
+                newState[5][6] = state[3][2];
+
+                newState[1][0] = state[1][2];
+                newState[1][1] = state[1][5];
+                newState[1][2] = state[1][8];
+                newState[1][3] = state[1][1];
+                newState[1][4] = state[1][4];
+                newState[1][5] = state[1][7];
+                newState[1][6] = state[1][0];
+                newState[1][7] = state[1][3];
+                newState[1][8] = state[1][6];
+                break;
+        }
+        return newState;
+    }
+
     public void doReplay(List<Move> moves) {
         if (moves.isEmpty()) {
             return;
@@ -536,6 +921,7 @@ public class Rubik {
         order = orderOriginal.stream().collect(Collectors.toList());
         rotations.setCube(order);
         count.set(-1);
+        appliedMoves = new ArrayList<>();
     }
 
     public SubScene getSubScene() {

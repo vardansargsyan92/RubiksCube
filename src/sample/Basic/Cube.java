@@ -1162,7 +1162,7 @@ public class Cube {
 			while(cubiePos[0][1][0].getDirOfColor('Y') != 'U' || cubiePos[2][1][0].getDirOfColor('Y') != 'U') {
 				moves += performMoves("U ");
 			}
-			moves += performMoves("F R U Ri Ui F' ");
+			moves += performMoves("F R U Ri Ui Fi ");
 		}
 		return moves;
 	}
@@ -1184,14 +1184,14 @@ public class Cube {
 					moves += performMoves("U ");
 				}
 				//Perform Sune algorithm to orient one corner
-				moves += performMoves("R U Ri U R U U R' ");
+				moves += performMoves("R U Ri U R U U Ri ");
 			}
 			else if(numOriented == 1){
 				//Sune case
 				while(cubiePos[0][0][0].getDirOfColor('Y') != 'U') {
 					moves += performMoves("U ");
 				}
-				moves += performMoves("R U Ri U R U U R' ");
+				moves += performMoves("R U Ri U R U U Ri ");
 			}
 			else if(numOriented == 2){
 				//Turn until there is a yellow sticker on the front of the ULF piece

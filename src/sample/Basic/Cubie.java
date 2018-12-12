@@ -85,18 +85,6 @@ public class Cubie {
 	}
 
 	/**
-	 * Changes the color in the given direction.
-	 * @param dir: direction
-	 * @param ncolor: new color
-	 */
-	public void setColorOfDir(char dir, char ncolor) {
-		for(int i = 0; i<colors.length; i++) {
-			if(colors[i].getDir() == dir)
-				colors[i].setColor(ncolor);
-		}
-	}
-
-	/**
 	 * Returns whether the cubie is a corner cubie
 	 * @return whether corner cubie
 	 */
