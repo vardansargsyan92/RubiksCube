@@ -19,17 +19,14 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import sample.Basic.Cube;
 import sample.Kociemba.KociembaSearch;
 import sample.model.Move;
 import sample.model.Moves;
 import sample.model.Rubik;
-import sample.model.Utils;
 
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -83,52 +80,7 @@ public class Main extends Application {
         basicSearchButton.setOnAction(e -> {
             //TODO basic search
             //TODO test
-            rubik.doSequence("X");
-
-//            String str = "D D F R Li B Ui";
-            String str = "F F D L R Li U Bi";
-            rubik.runSequence(str);
-
-            Cube c = new Cube();
-//            str = "F F D L R Li U Bi";
-            c.scramble(str);
-
-            String sunflower = c.makeSunflower();
-            System.out.println(1);
-            System.out.println(sunflower);
-            rubik.runSequence(sunflower);
-
-            String whiteCross = c.makeWhiteCross();
-            System.out.println(2);
-            System.out.println(whiteCross);
-            rubik.runSequence(whiteCross);
-
-            String whiteCorners = c.finishWhiteLayer();
-            System.out.println(3);
-            System.out.println(whiteCorners);
-            rubik.runSequence(whiteCorners);
-
-            String edges = c.insertAllEdges();
-            System.out.println(4);
-            System.out.println(edges);
-            rubik.runSequence(edges);
-
-            String yellowCross = c.makeYellowCross();
-            System.out.println(5);
-            System.out.println(yellowCross);
-            rubik.runSequence(yellowCross);
-
-            String ool = c.orientLastLayer();
-            System.out.println(6);
-            System.out.println(ool);
-            rubik.runSequence(ool);
-
-            String pll = c.permuteLastLayer();
-            System.out.println(7);
-            System.out.println(pll);
-            rubik.runSequence(pll);
-
-//            rubik.doSequence("Y Yi");
+            // see the 2D version shared at https://github.com/seda-man/CubeRube-1
         });
 
         /**

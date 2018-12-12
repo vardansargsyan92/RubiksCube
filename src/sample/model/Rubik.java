@@ -423,42 +423,6 @@ public class Rubik {
 //        }
 //    }
 
-    private String checkChar(String l1, char a) {
-        switch (a) {
-            case 'R':
-                l1 = l1.concat("L");
-                break;
-            case 'L':
-                l1 = l1.concat("R");
-                break;
-            case 'U':
-                l1 = l1.concat("B");
-                break;
-            case 'D':
-                l1 = l1.concat("F");
-                break;
-            case 'B':
-                l1 = l1.concat("U");
-                break;
-            case 'F':
-                l1 = l1.concat("D");
-                break;
-            default:
-                l1 = l1.concat(String.valueOf(a));
-                break;
-        }
-        return l1;
-    }
-
-    public void runSequence(String list) {
-        String l1 = new String();
-        for (int i = 0; i < list.length(); i++) {
-            l1 = checkChar(l1, list.charAt(i));
-        }
-
-        doSequence(l1);
-    }
-
     public void doSequence(String list) {
         onScrambling.set(true);
         sequence = Utils.unifyNotation(list);
